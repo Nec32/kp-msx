@@ -114,10 +114,14 @@ async def menu(request: Request):
 async def registration(request: Request):
     if request.state.device.registered():
         return msx.already_registered()
-    else:
-        user_code, device_code = await KinoPub.get_codes()
-        request.state.device.update_code(device_code)
+
+    user_code = request.state.device.has_code()
+    if user_code:
         return msx.registration(user_code)
+
+    codeObject = await KinoPub.get_codes()
+    request.state.device.update_code(codeObject)
+    return msx.registration(codeObject['user_code'])
 
 
 @app.post(ENDPOINT + '/check_registration')

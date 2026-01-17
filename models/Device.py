@@ -1,3 +1,4 @@
+import time
 from models.DeviceSettings import DeviceSettings
 from models.KinoPub import KinoPub
 from util import db
@@ -34,8 +35,13 @@ class Device:
         db.create_device(entry)
         return cls(entry)
 
-    def update_code(self, code):
-        db.update_device_code(self.id, code)
+    def update_code(self, codeObject):
+        db.update_device_code(self.id, codeObject)
+
+    def has_code(self):
+        if self.code:
+            return self.code['user_code'] if self.code['expires_in'] > time.time() else None
+        return None
 
     def update_tokens(self, token, refresh):
         db.update_device_tokens(self.id, token, refresh)
