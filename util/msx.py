@@ -112,17 +112,26 @@ def sad_screen():
 
 def already_registered():
     return {
-        "type": "list",
-        "headline": "Template",
-        "template": {
-            "type": "separate",
-            "layout": "0,0,2,4",
-            "color": "msx-glass",
-            "title": "Title",
-        },
-        "items": [{
-            "title": "Уже зарегистрирован"
-        }]
+        "type": "pages",
+        "headline": "Регистрация",
+        "flag": "registration",
+        "pages": [
+            {
+                "items": [
+                    {
+                        "type": "space",
+                        "layout": "0,0,6,2",
+                        "titleHeader": "что-то пошло не так...",
+                        "title": "Вы уже зарегистрированы"
+                    }, {
+                        "type": "button",
+                        "layout": "0,2,6,1",
+                        "label": "Перезапустить приложение",
+                        "action": "reload"
+                    }
+                ]
+            }
+        ]
     }
 
 
@@ -130,12 +139,17 @@ def registration(user_code):
     return {
         "type": "pages",
         "headline": "Регистрация",
+        "flag": "registration",
+        "underlay": { # Content is visible
+            "action": format_action('/msx/check_registration', params={'silent': 1}, module='lazy:delay:check:10:execute:silent')
+        },
         "pages": [
             {
                 "items": [
                     {
                         "type": "space",
                         "layout": "0,0,6,2",
+                        "titleHeader": "код:",
                         "title": user_code,
                         "titleFooter": 'Используйте этот код для добавления устройства на kino.pub или зеркале, после ввода кода нажмите кнопку "Я ввел код".'
                     }, {
@@ -149,15 +163,65 @@ def registration(user_code):
         ]
     }
 
+def page_expired():
+    return {
+        "type": "pages",
+        "headline": "Регистрация",
+        "flag": "registration",
+        "pages": [
+            {
+                "items": [
+                    {
+                        "type": "space",
+                        "layout": "0,0,6,2",
+                        "title": "{txt:msx-red:КОД ИСТЕК}",
+                        "titleFooter": 'Вы не успели ввести код в течении 5 минут.'
+                    }, {
+                        "type": "button",
+                        "layout": "0,2,6,1",
+                        "label": "Обновить код",
+                        "action": format_action('/msx/registration', module='replace:content:registration')
+                    }
+                ]
+            }
+        ]
+    }
 
 def code_not_entered():
     return {
         'response': {
             'status': 200,
-            'data': {'action': 'warn:Код не введён. Если прошло больше 5 минут, перезапустите приложение для получения нового кода.'}
+            'data': {'action': 'warn:Код не введён. Необходимо перейти на web страницу "Мои устройства" и ввести код в поле активации устройства!'}
         }
     }
 
+def code_has_expired():
+    return {
+        'response': {
+            'status': 200,
+            'data': {
+                'action': '[error:Код истёк. Получите новый код.|' + format_action('/msx/page_expired', module='replace:content:registration') + ']'
+            }
+        }
+    }
+
+def registration_delay_check():
+    return {
+        'response': {
+            'status': 200,
+            'data': {'action': format_action('/msx/check_registration', params={'silent': 1}, module='delay:check:10:execute:silent')}
+        }
+    }
+
+def registration_success():
+    return {
+        "response": {
+            "status": 200,
+            "data": {
+                "action": "[success:Вы зарегистрировались|" + format_action('/msx/menu', module='menu') + "]"
+            }
+        }
+    }
 
 def restart():
     return {
@@ -166,7 +230,6 @@ def restart():
             'data': {'action': 'reload'}
         }
     }
-
 
 def content(entries, category, page, extra=None, decompress=None):
     resp = {

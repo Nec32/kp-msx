@@ -177,7 +177,7 @@ class KinoPub:
             response = await s.post('https://api.service-kp.com/oauth2/device', params=params)
             result = await response.json()
             if result.get('error') is not None:
-                return None
+                return result.get('error')
             return result
 
     async def refresh_tokens(self):

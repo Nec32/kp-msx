@@ -122,13 +122,23 @@ async def registration(request: Request):
 
 @app.post(ENDPOINT + '/check_registration')
 async def check_registration(request: Request):
-    result = await KinoPub.check_registration(request.state.device.code)
-    if result is None:
-        return msx.code_not_entered()
-    request.state.device.update_tokens(result['access_token'], result['refresh_token'])
-    await request.state.device.notify()
-    return msx.restart()
+    if request.state.device.registered():
+        return msx.registration_success()
 
+    result = await KinoPub.check_registration(request.state.device.code)
+    if isinstance(result, str):
+        if result == "bad_verification_code" or result == "code_expired":
+            return msx.code_has_expired()
+        else: #if result == "authorization_pending":
+            return msx.code_not_entered() if request.query_params.get('silent') is None else msx.registration_delay_check()
+
+    request.state.device.update_tokens(result['access_token'], result['refresh_token'])
+    await request.state.device.notify() # Обновление информации о регистрации на сайте
+    return msx.registration_success()
+
+@app.get(ENDPOINT + '/page_expired')
+async def page_expired(request: Request):
+    return msx.page_expired()
 
 @app.get(ENDPOINT + '/category')
 async def category(request: Request):
