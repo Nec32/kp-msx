@@ -21,15 +21,16 @@ class KinoPub:
     async def api(self, path, params=None, method='GET'):
         headers = {'Authorization': 'Bearer ' + self.token}
         async with aiohttp.ClientSession(headers=headers, timeout=aiohttp.ClientTimeout(total=5)) as s:
+            url = f'{config.API_URL}/v1{path}'
             if method == 'GET':
-                response = await s.get(f'https://api.service-kp.com/v1{path}', params=params)
+                response = await s.get(url, params=params)
             else:
-                response = await s.request(method, f'https://api.service-kp.com/v1{path}', json=params)
+                response = await s.request(method, url, json=params)
 
             if response.status == 401:
                 reauth_result = await self.refresh_tokens()
                 if reauth_result:
-                    return await self.api(path, params=params)
+                    return await self.api(path, params=params, method=method)
                 else:
                     return None
             result = await response.json()
@@ -161,7 +162,7 @@ class KinoPub:
             'client_secret': config.KP_CLIENT_SECRET
         }
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=5)) as s:
-            response = await s.post('https://api.service-kp.com/oauth2/device', params=params)
+            response = await s.post(f'{config.API_URL}/oauth2/device', params=params)
             result = await response.json()
             return result['user_code'], result['code']
 
@@ -174,7 +175,7 @@ class KinoPub:
             'code': code
         }
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=5)) as s:
-            response = await s.post('https://api.service-kp.com/oauth2/device', params=params)
+            response = await s.post(f'{config.API_URL}/oauth2/device', params=params)
             result = await response.json()
             if result.get('error') is not None:
                 return None
@@ -188,7 +189,7 @@ class KinoPub:
             'refresh_token': self.refresh
         }
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=5)) as s:
-            response = await s.post('https://api.service-kp.com/oauth2/device', params=params)
+            response = await s.post(f'{config.API_URL}/oauth2/device', params=params)
             result = await response.json()
             if result.get('error') is not None:
                 return False
