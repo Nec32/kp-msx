@@ -3,7 +3,12 @@ import json
 import config
 from util import sqlite_migrations
 
-connection = sqlite3.connect(config.SQLITE_URL, autocommit=True)
+connection = sqlite3.connect(config.SQLITE_URL)
+if hasattr(connection, 'autocommit'):
+    connection.autocommit = True
+else:
+    # Fallback for older versions
+    connection.isolation_level = None
 
 connection.execute(
     '''
