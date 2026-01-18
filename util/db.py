@@ -1,4 +1,5 @@
 import config
+import json
 
 if config.IS_SQLITE:
   import util.db_sqlite as db
@@ -6,12 +7,19 @@ else:
   import util.db_mongo as db
 
 def get_device_by_id(device_id):
-    return db.get_device_by_id(device_id)
+    data = db.get_device_by_id(device_id)
+    if data and data.get('code'):
+        try:
+            data['code'] = json.loads(data.get('code'))
+        except:
+            data['code'] = None
+    return data
 
 def create_device(entry):
     return db.create_device(entry)
 
-def update_device_code(id, code):
+def update_device_code(id, codeObject):
+    code = json.dumps(codeObject)
     return db.update_device_code(id, code)
 
 def update_device_tokens(id, token, refresh):

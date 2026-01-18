@@ -1,6 +1,7 @@
 import aiohttp
 
 import config
+import time
 from models.Category import Category
 from models.Channel import Channel
 from models.Content import Content
@@ -163,8 +164,10 @@ class KinoPub:
         }
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=5)) as s:
             response = await s.post(f'{config.API_URL}/oauth2/device', params=params)
+            timestamp_seconds = time.time()
             result = await response.json()
-            return result['user_code'], result['code']
+            result['expires_in'] += timestamp_seconds
+            return result
 
     @staticmethod
     async def check_registration(code):
