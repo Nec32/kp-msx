@@ -140,7 +140,9 @@ async def check_registration(request: Request):
         if result == "bad_verification_code" or result == "code_expired":
             return msx.code_has_expired()
         else: #if result == "authorization_pending":
-            return msx.code_not_entered() if request.query_params.get('silent') is None else msx.registration_delay_check()
+            resp = msx.code_not_entered() if request.query_params.get('silent') is None else msx.registration_delay_check()
+            resp["response"]["data"]["error"] = result
+            return resp
 
     request.state.device.update_tokens(result['access_token'], result['refresh_token'])
     await request.state.device.notify() # Обновление информации о регистрации на сайте
