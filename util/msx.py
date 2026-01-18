@@ -8,7 +8,7 @@ LENNY =  "¯\\_(ツ)_/¯"
 SAD_LENNY = "(◡︵◡)"
 
 
-def format_action(path: str, params: dict = None, interaction: str = None, options: str = None, module: str = None):
+def format_action(path: str, params: dict = None, interaction: str = None, options: str = None, module: str = None, msx_version: int = 0):
     if params is None:
         params = {}
     params.update({'id': '{ID}'})
@@ -31,6 +31,8 @@ def format_action(path: str, params: dict = None, interaction: str = None, optio
         data = data + '@' + interaction
 
     if module:
+        if msx_version < 1163:
+            module = module.replace("execute:silent", "execute")
         data = module + ':' + data
 
     return data

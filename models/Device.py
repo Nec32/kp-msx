@@ -13,6 +13,7 @@ class Device:
         self.kp = KinoPub(self.token, self.refresh)
         self.settings = DeviceSettings(data.get('settings'))
         self.user_agent = data.get('user_agent')
+        self.msx_version = 0
 
     def registered(self):
         if self.token is not None:

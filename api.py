@@ -59,8 +59,14 @@ async def auth(request: Request, call_next):
     request.state.device = Device.by_id(device_id)
     if request.state.device is None and device_id is not None:
         request.state.device = Device.create(device_id)
-    if request.state.device is not None and request.state.device.user_agent is None and (ua := request.headers.get('user-agent')) is not None:
-        request.state.device.update_user_agent(ua)
+    if request.state.device:
+        if request.state.device.user_agent is None and (ua := request.headers.get('user-agent')) is not None:
+            request.state.device.update_user_agent(ua)
+        version = request.query_params.get('v')
+        if version:
+            v_parts = version.split(".")
+            if len(v_parts) >= 3:
+                request.state.device.msx_version = int(v_parts[0]) * 10000 + int(v_parts[1]) * 1000 + int(v_parts[2])
     try:
         result = await call_next(request)
     except Exception as e:
@@ -125,7 +131,11 @@ async def check_registration(request: Request):
     if request.state.device.registered():
         return msx.registration_success()
 
-    result = await KinoPub.check_registration(request.state.device.code)
+    code = request.state.device.code or ""
+    if not isinstance(code, str):
+        code = code['code'] # Если приняли доработку pull-2
+
+    result = await KinoPub.check_registration(code)
     if isinstance(result, str):
         if result == "bad_verification_code" or result == "code_expired":
             return msx.code_has_expired()
