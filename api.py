@@ -59,8 +59,14 @@ async def auth(request: Request, call_next):
     request.state.device = Device.by_id(device_id)
     if request.state.device is None and device_id is not None:
         request.state.device = Device.create(device_id)
-    if request.state.device is not None and request.state.device.user_agent is None and (ua := request.headers.get('user-agent')) is not None:
-        request.state.device.update_user_agent(ua)
+    if request.state.device:
+        if request.state.device.user_agent is None and (ua := request.headers.get('user-agent')) is not None:
+            request.state.device.update_user_agent(ua)
+        version = request.query_params.get('v')
+        if version:
+            v_parts = version.split(".")
+            if len(v_parts) >= 3:
+                request.state.device.msx_version = int(v_parts[0]) * 10000 + int(v_parts[1]) * 1000 + int(v_parts[2])
     try:
         result = await call_next(request)
     except Exception as e:
@@ -122,13 +128,27 @@ async def registration(request: Request):
 
 @app.post(ENDPOINT + '/check_registration')
 async def check_registration(request: Request):
-    result = await KinoPub.check_registration(request.state.device.code)
-    if result is None:
-        return msx.code_not_entered()
-    request.state.device.update_tokens(result['access_token'], result['refresh_token'])
-    await request.state.device.notify()
-    return msx.restart()
+    if request.state.device.registered():
+        return msx.registration_success()
 
+    code = request.state.device.code or ""
+    if not isinstance(code, str):
+        code = code['code'] # Если приняли доработку pull-2
+
+    result = await KinoPub.check_registration(code)
+    if isinstance(result, str):
+        if result == "bad_verification_code" or result == "code_expired":
+            return msx.code_has_expired()
+        else: #if result == "authorization_pending":
+            return msx.code_not_entered() if request.query_params.get('silent') is None else msx.registration_delay_check()
+
+    request.state.device.update_tokens(result['access_token'], result['refresh_token'])
+    await request.state.device.notify() # Обновление информации о регистрации на сайте
+    return msx.registration_success()
+
+@app.get(ENDPOINT + '/page_expired')
+async def page_expired(request: Request):
+    return msx.page_expired()
 
 @app.get(ENDPOINT + '/category')
 async def category(request: Request):
