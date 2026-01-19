@@ -10,7 +10,7 @@ class Category:
         {'id': 'toons', 'title': 'Мультфильмы', 'path': '/msx/category', 'params': {'genre': '23', 'page': '{PAGE}'}, 'interaction': f'{config.MSX_HOST}/paging.html'},
         {'id': 'anime', 'title': 'Аниме', 'path': '/msx/category', 'params': {'genre': '25', 'page': '{PAGE}'}, 'interaction': f'{config.MSX_HOST}/paging.html'},
         {'id': 'sport', 'title': 'Спорт', 'path': '/msx/tv'},
-        {'id': 'search', 'title': 'Поиск', 'icon': 'search', 'path': '/msx/search', 'params': {'q': '{INPUT}'}, 'interaction': 'http://msx.benzac.de/interaction/input.html', 'options': 'search:3|ru'},
+        {'id': 'search', 'title': 'Поиск', 'icon': 'search', 'path': '/msx/search', 'params': {'q': '{INPUT}'}, 'interaction': 'https://msx.benzac.de/interaction/input.html', 'options': 'search:3|ru'},
         {'id': 'bookmarks', 'title': 'Закладки', 'icon': 'bookmark', 'path': '/msx/bookmarks'},
         {'id': 'history', 'title': 'История', 'icon': 'history', 'path': '/msx/history', 'params': {'page': '{PAGE}'}, 'interaction': f'{config.MSX_HOST}/paging.html'},
         {'id': 'watching', 'title': 'Я смотрю', 'icon': 'tv', 'path': '/msx/watching'}

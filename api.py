@@ -63,7 +63,7 @@ async def auth(request: Request, call_next):
         request.state.device.update_user_agent(ua)
     try:
         result = await call_next(request)
-    except Exception as e:
+    except:
         result = JSONResponse(msx.handle_exception())
         result.headers['Access-Control-Allow-Credentials'] = 'true'
         result.headers['Access-Control-Allow-Origin'] = '*'

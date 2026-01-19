@@ -1,6 +1,5 @@
 from urllib.parse import urlencode
 import config
-from config import ALTERNATIVE_PLAYER
 from models.DeviceSettings import DeviceSettings
 from util.proxy import make_proxy_url
 
@@ -355,7 +354,7 @@ def unsupported_version():
                         "data": {
                             'name': 'web.msx.benzac.de',
                             'version': '1.0.2',
-                            'parameter': "content:http://web.msx.benzac.de/msx/start.json",
+                            'parameter': "content:https://web.msx.benzac.de/msx/start.json",
                         }
                     }
                 ]
@@ -460,10 +459,10 @@ def stamp(cond):
 def label(text):
     return {'label': text}
 
-def settings_button(id, label, action, hint):
+def settings_button(button_id, button_label, action, hint):
     return {
-        'id': id,
-        "label": label,
+        'id': button_id,
+        "label": button_label,
         'action': action,
         "selection": {
             "action": "update:panel:info",

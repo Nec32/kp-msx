@@ -1,11 +1,6 @@
-from urllib.parse import urlencode
-
-import config
 from models.Playable import Playable
-from models.SubtitleTrack import SubtitleTrack
 from util import msx
-from util.msx import content
-from util.proxy import remember_domain, make_proxy_url
+
 
 class Video(Playable):
 

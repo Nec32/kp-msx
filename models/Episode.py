@@ -1,9 +1,5 @@
-from urllib.parse import urlencode
-
-import config
 from models.Playable import Playable
 from util import msx
-from util.proxy import make_proxy_url
 
 
 class Episode(Playable):

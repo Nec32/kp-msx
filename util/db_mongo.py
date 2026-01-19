@@ -16,27 +16,27 @@ def create_device(entry):
     return devices.insert_one(entry)
 
 
-def update_device_code(id, code):
-    return devices.update_one({'id': id}, {'$set': {'code': code}})
+def update_device_code(device_id, code):
+    return devices.update_one({'id': device_id}, {'$set': {'code': code}})
 
 
-def update_device_tokens(id, token, refresh):
-    return devices.update_one({'id': id}, {'$set': {'token': token, 'refresh': refresh}})
+def update_device_tokens(device_id, token, refresh):
+    return devices.update_one({'id': device_id}, {'$set': {'token': token, 'refresh': refresh}})
 
 
 def update_tokens(token, param, param1):
     return devices.update_one({'token': token}, {'$set': {'token': param, 'refresh': param1}})
 
 
-def delete_device(id):
-    return devices.delete_one({'id': id})
+def delete_device(device_id):
+    return devices.delete_one({'id': device_id})
 
 
-def update_device_user_agent(id, user_agent):
-    return devices.update_one({'id': id}, {'$set': {'user_agent': user_agent}})
+def update_device_user_agent(device_id, user_agent):
+    return devices.update_one({'id': device_id}, {'$set': {'user_agent': user_agent}})
 
-def update_device_settings(id, param):
-    return devices.update_one({'id': id}, {'$set': {'settings': param}})
+def update_device_settings(device_id, param):
+    return devices.update_one({'id': device_id}, {'$set': {'settings': param}})
 
 def get_domain(domain):
     return domains.find_one({'domain': domain})

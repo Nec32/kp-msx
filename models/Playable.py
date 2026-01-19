@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 import config
 from models.SubtitleTrack import SubtitleTrack
 from util import msx

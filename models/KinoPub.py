@@ -69,8 +69,8 @@ class KinoPub:
         results = [Content(i) for i in result['items']]
         return results
 
-    async def get_single_content(self, id):
-        result = await self.api(f'/items/{id}')
+    async def get_single_content(self, content_id):
+        result = await self.api(f'/items/{content_id}')
         if result is None:
             return None
         return Content(result['item'])

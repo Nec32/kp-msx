@@ -1,7 +1,6 @@
 from urllib.parse import urlencode
 
 import config
-from util.proxy import make_proxy_url
 
 
 class Channel:
