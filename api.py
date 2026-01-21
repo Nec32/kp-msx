@@ -2,6 +2,7 @@ import traceback
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, FileResponse, Response
@@ -70,26 +71,12 @@ async def auth(request: Request, call_next):
         traceback.print_exc()
     return result
 
-# Static files
-
-@app.get('/')
-async def index(request: Request):
-    return FileResponse('pages/index.html')
-
 @app.get('/subtitleShifter')
-async def subtitle_editor(request: Request):
+async def subtitle_editor():
     return FileResponse('pages/subtitle_shifter.html')
 
-@app.get('/paging.html')
-async def subtitle_editor(request: Request):
-    return FileResponse('pages/paging.html')
-
-@app.get('/paging.js')
-async def subtitle_editor(request: Request):
-    return FileResponse('pages/paging.js')
-
 @app.get(ENDPOINT + '/start.json')
-async def start(request: Request):
+async def start():
     return msx.start()
 
 # General endpoints
@@ -361,11 +348,11 @@ async def toggle_menu_entry(request: Request):
 # Errors
 
 @app.get(ENDPOINT + '/error')
-async def error_page(request: Request):
+async def error_page():
     return msx.handle_exception(error_page=True)
 
 @app.get(ENDPOINT + '/too_old')
-async def too_old(request: Request):
+async def too_old():
     return msx.unsupported_version()
 
 # Proxy
@@ -380,6 +367,9 @@ async def proxy_req(request: Request):
         return Response(status_code=403)
     return Response(contents, code, media_type=content_type)
 
+
+# API endpoints must be defined before the mount
+app.mount("/", StaticFiles(directory="pages", html=True), name="static")
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=int(config.PORT))
